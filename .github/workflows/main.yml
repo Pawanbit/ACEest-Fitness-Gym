@@ -12,6 +12,10 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: aceest-fitness-cicd
+
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -30,7 +34,7 @@ jobs:
       - name: Lint Python code
         run: flake8 .
 
-      - name: Run tests
+      - name: Run Pytest
         run: pytest -v
 
       - name: Build Docker image
