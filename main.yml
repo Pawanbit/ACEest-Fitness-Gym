@@ -1,0 +1,39 @@
+name: ACEest CI
+
+on:
+  push:
+    branches: ["main", "develop", "feature/**"]
+  pull_request:
+    branches: ["main", "develop"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: Install dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Compile and lint
+        run: |
+          python -m compileall -q app.py tests
+          python -m pip install ruff
+          ruff check app.py tests
+      - name: Run unit tests
+        run: pytest -q
+      - name: Build Docker image
+        run: docker build --tag aceest-fitness:${{ github.sha }} .
+      - name: Run tests inside Docker image
+        run: |
+          docker run --rm --entrypoint sh aceest-fitness:${{ github.sha }} -c \
+            "pip install --no-cache-dir pytest ruff && python -m compileall -q app.py && ruff check app.py && pytest -q"
