@@ -1,4 +1,5 @@
-"""ACEest Fitness & Gym: lightweight Flask API for client and progress management."""
+"""ACEest Fitness & Gym: 
+lightweight Flask API for client and progress management."""
 import os
 import sqlite3
 from datetime import date
